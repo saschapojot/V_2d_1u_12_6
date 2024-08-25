@@ -129,7 +129,9 @@ all_equal = np.all(lengthsAll == lengthsAll[0])
 if all_equal==False:
     print("data missing.")
     exit(missingErrCode)
-
+def swpEnd(fileName):
+    matchEnd=re.search(r"sweepEnd(\d+)",fileName)
+    return int(matchEnd.group(1))
 def oneArray(n):
     """
 
@@ -175,17 +177,20 @@ def oneArray(n):
         x00_arr,y00_arr,x01_arr,y01_arr,x10_arr,y10_arr,x11_arr,y11_arr
     ]).T
 
-    return arrCombined
+    arr_converted=np.apply_along_axis(convert_row,axis=1,arr=arrCombined)
+
+    return arr_converted
+
 tConvertStart=datetime.now()
 converted_dataDir=dataFileRoot+"/converted_data/"
 Path(converted_dataDir).mkdir(parents=True,exist_ok=True)
 
 for n in range(0,lengths_x[0]):
-    arrTmp=oneArray(n)
-
-    outFile=converted_dataDir+"/latticeFile"+str(n)+".pkl"
+    arrConvertedTmp=oneArray(n)
+    swp_endNum=swpEnd(filesVec_x[0][n])
+    outFile=converted_dataDir+"/latticeFile_sweepEnd"+str(swp_endNum)+".pkl"
     with open(outFile,"bw+") as fptr:
-        pickle.dump(arrTmp,fptr)
+        pickle.dump(arrConvertedTmp,fptr)
 tConvertEnd=datetime.now()
 
 print("converting time: ",tConvertEnd-tConvertStart)
